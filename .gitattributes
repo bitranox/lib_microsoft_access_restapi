@@ -1,0 +1,10 @@
+# VBA module exports MUST use CRLF line endings. The VBE parses the
+# .bas/.cls header (VERSION 1.0 CLASS / BEGIN / END / Attribute lines)
+# expecting CRLF; LF-only files cause "Erwartet Anweisungsende" /
+# "Statement end expected" compile errors at import time.
+*.bas text eol=crlf
+*.cls text eol=crlf
+*.frm text eol=crlf
+
+# PowerShell on Windows is happy with either, but keep it Windows-native.
+*.ps1 text eol=crlf
