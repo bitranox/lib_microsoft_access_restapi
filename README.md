@@ -27,6 +27,16 @@ The script imports every production module. Flags:
 - `-Force` — replace components that already exist in the target. By
   default existing modules are left untouched.
 
+The installer always prints a clearly visible result on completion —
+either an `ERROR:` block (database not found, file locked, COM /
+Trust-Center problem, etc.) or a green
+`Installation completed successfully.` banner with the database path
+and module counts — and then waits for a keypress before closing. Safe
+to launch by double-click; the window will not vanish on error. Exit
+codes: `0` success, `1` unexpected failure, `2` bad arguments
+(database / module file not found), `3` Access not installed,
+`4` could not open database, `5` VBA project model not reachable.
+
 Prereq: Trust Center → Macro Settings → **"Trust access to the VBA
 project object model"** must be enabled (one-time, per-user Access
 setting). No type-library references are required: MSXML, Scripting,
