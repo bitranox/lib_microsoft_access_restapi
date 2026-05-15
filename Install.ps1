@@ -122,12 +122,34 @@ function Get-ComponentName([string]$filePath) {
 
 # --- Pre-flight checks ---
 
+# When invoked via `powershell -File ... -Database "C:\path with spaces\f.accdb"`
+# from cmd.exe, the surrounding quotes are sometimes passed *into* the
+# parameter value (so $Database literally starts and ends with "). Strip
+# stray surrounding quotes and whitespace so Test-Path actually sees the path.
+$RawDatabase = $Database
+$Database = $Database.Trim()
+if ($Database.Length -ge 2) {
+    $first = $Database[0]; $last = $Database[$Database.Length - 1]
+    if (($first -eq '"' -and $last -eq '"') -or ($first -eq "'" -and $last -eq "'")) {
+        $Database = $Database.Substring(1, $Database.Length - 2).Trim()
+    }
+}
+
 if (-not (Test-Path -LiteralPath $Database)) {
     Write-Host ""
     Write-Host "ERROR: The specified database file was not found:" -ForegroundColor Red
-    Write-Host "  $Database" -ForegroundColor Red
+    Write-Host "  [$Database]" -ForegroundColor Red
+    if ($RawDatabase -ne $Database) {
+        Write-Host "  (raw argument received: [$RawDatabase])" -ForegroundColor DarkGray
+    }
     Write-Host ""
     Write-Host "Please check the path and run the script again." -ForegroundColor Yellow
+    if ($Database -match '\s' -or $Database -match '[&()]') {
+        Write-Host ""
+        Write-Host "Tip: paths containing spaces or special characters must be quoted." -ForegroundColor Yellow
+        Write-Host "From cmd.exe, prefer the -Command form over -File:" -ForegroundColor Yellow
+        Write-Host '  powershell -ExecutionPolicy Bypass -Command "& .\Install.ps1 -Database ''C:\path with spaces\app.accdb''"' -ForegroundColor Yellow
+    }
     Exit-WithKey 2
 }
 
